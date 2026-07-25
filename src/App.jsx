@@ -6,6 +6,7 @@ import Comunidade from "./components/Comunidade";
 import Participacao from "./components/Participacao";
 import Contato from "./components/Contato";
 import Footer from "./components/Footer";
+import ContadorVisitas from "./components/ContadorVisitas";
 
 
 function App() {
@@ -17,6 +18,8 @@ return(
 <Navbar />
 
 <Hero />
+
+<ContadorVisitas />
 
 <Historia />
 
