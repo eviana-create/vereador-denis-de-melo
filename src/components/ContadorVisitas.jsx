@@ -1,14 +1,29 @@
 import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc, setDoc, increment } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  increment,
+  onSnapshot
+} from "firebase/firestore";
+
 import { db } from "../firebase";
 
 
 function ContadorVisitas() {
 
+
   const [visitas, setVisitas] = useState(0);
 
 
+
   useEffect(() => {
+
+
+    const referencia =
+      doc(db, "estatisticas", "visitas");
+
 
 
     async function registrarVisita() {
@@ -16,10 +31,6 @@ function ContadorVisitas() {
 
       const visitou =
         localStorage.getItem("visitou-denis");
-
-
-      const referencia =
-        doc(db, "estatisticas", "visitas");
 
 
 
@@ -65,25 +76,37 @@ function ContadorVisitas() {
       }
 
 
-
-      const atual =
-        await getDoc(referencia);
-
-
-
-      if (atual.exists()) {
-
-        setVisitas(
-          atual.data().contador
-        );
-
-      }
-
-
     }
 
 
+
     registrarVisita();
+
+
+
+    const cancelar =
+      onSnapshot(
+        referencia,
+        (documento)=>{
+
+
+          if(documento.exists()){
+
+
+            setVisitas(
+              documento.data().contador
+            );
+
+
+          }
+
+
+        }
+      );
+
+
+
+    return () => cancelar();
 
 
   }, []);
@@ -94,21 +117,24 @@ function ContadorVisitas() {
 
     <section
       className="
-      py-10
-      bg-gray-100
+      py-12
+      bg-white
       "
     >
 
       <div
         className="
+        max-w-4xl
+        mx-auto
+        px-6
         text-center
         "
       >
 
         <h2
           className="
-          text-2xl
-          font-bold
+          text-3xl
+          font-black
           text-gray-900
           "
         >
@@ -118,27 +144,42 @@ function ContadorVisitas() {
         </h2>
 
 
+
         <p
           className="
-          mt-3
+          mt-4
+          text-lg
           text-gray-600
           "
         >
 
-          <strong>
-            +{visitas}
-          </strong>
+          Mais de
 
-          pessoas já conheceram nossa história
+          <span
+            className="
+            mx-2
+            text-4xl
+            font-black
+            text-blue-600
+            "
+          >
+
+            +{visitas}
+
+          </span>
+
+          pessoas já conheceram nossa história.
 
         </p>
 
 
       </div>
 
+
     </section>
 
   );
+
 
 }
 
