@@ -90,55 +90,68 @@ function ContadorVisitas() {
 
 
 
-  return (
+return (
 
-    <section
-      className="
-      py-10
-      bg-gray-100
-      "
-    >
+<section
+  className="
+  py-12
+  bg-white
+  "
+>
 
-      <div
-        className="
-        text-center
-        "
-      >
+<div
+className="
+max-w-4xl
+mx-auto
+px-6
+text-center
+"
+>
 
-        <h2
-          className="
-          text-2xl
-          font-bold
-          text-gray-900
-          "
-        >
+<h2
+className="
+text-3xl
+font-black
+text-gray-900
+"
+>
 
-          🤝 Nossa comunidade está crescendo
+🤝 Nossa comunidade está crescendo
 
-        </h2>
-
-
-        <p
-          className="
-          mt-3
-          text-gray-600
-          "
-        >
-
-          <strong>
-            +{visitas}
-          </strong>
-
-          pessoas já conheceram nossa história
-
-        </p>
+</h2>
 
 
-      </div>
+<p
+className="
+mt-4
+text-lg
+text-gray-600
+"
+>
 
-    </section>
+Mais de
 
-  );
+<span
+className="
+mx-2
+text-4xl
+font-black
+text-blue-600
+"
+>
++{visitas}
+</span>
+
+pessoas já conheceram nossa história.
+
+</p>
+
+
+</div>
+
+</section>
+
+);
 
 }
 
