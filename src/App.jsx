@@ -7,7 +7,8 @@ import Participacao from "./components/Participacao";
 import Contato from "./components/Contato";
 import Footer from "./components/Footer";
 import ContadorVisitas from "./components/ContadorVisitas";
-
+import VilaMoraes from "./components/VilaMoraes";
+import Galeria from "./components/Galeria";
 
 function App() {
 
@@ -22,6 +23,10 @@ return(
 <ContadorVisitas />
 
 <Historia />
+
+<VilaMoraes />
+
+<Galeria />
 
 <Causas />
 
