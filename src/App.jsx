@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import ContadorVisitas from "./components/ContadorVisitas";
 import VilaMoraes from "./components/VilaMoraes";
 import Galeria from "./components/Galeria";
+import GaleriaDenis from "./components/GaleriaDenis";
 
 function App() {
 
@@ -23,6 +24,8 @@ return(
 <ContadorVisitas />
 
 <Historia />
+
+<GaleriaDenis />
 
 <VilaMoraes />
 
