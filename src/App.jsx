@@ -1,51 +1,22 @@
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import Historia from "./components/Historia";
-import Causas from "./components/Causas";
-import Comunidade from "./components/Comunidade";
-import Participacao from "./components/Participacao";
-import Contato from "./components/Contato";
-import Footer from "./components/Footer";
-import ContadorVisitas from "./components/ContadorVisitas";
-import VilaMoraes from "./components/VilaMoraes";
-import Galeria from "./components/Galeria";
-import GaleriaDenis from "./components/GaleriaDenis";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Home from "./pages/Home";
+import Galeria from "./pages/Galeria";
 
 function App() {
+  return (
+    <BrowserRouter>
 
-return(
+      <Routes>
 
-<>
+        <Route path="/" element={<Home />} />
 
-<Navbar />
+        <Route path="/galeria" element={<Galeria />} />
 
-<Hero />
+      </Routes>
 
-<ContadorVisitas />
-
-<Historia />
-
-<GaleriaDenis />
-
-<VilaMoraes />
-
-<Galeria />
-
-<Causas />
-
-<Comunidade />
-
-<Participacao />
-
-<Contato />
-
-<Footer />
-
-</>
-
-)
-
+    </BrowserRouter>
+  );
 }
-
 
 export default App;

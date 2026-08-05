@@ -105,7 +105,7 @@ function GaleriaDenis() {
     setCurtidas(resultado);
 
   }
-
+}
 
 
 
@@ -133,31 +133,55 @@ function GaleriaDenis() {
     );
 
 
-    await updateDoc(
-      referencia,
-      {
-        curtidas: increment(1)
-      }
-    );
+    async function curtir(id) {
+
+  const jaCurtiu =
+    localStorage.getItem(`curtiu-${id}`);
 
 
-
-    localStorage.setItem(
-      `curtiu-${id}`,
-      "true"
-    );
+  if (jaCurtiu) {
+    return;
+  }
 
 
-    setCurtidas((atual)=>({
+  const referencia = doc(
+    db,
+    "galeriaDenis",
+    id
+  );
 
-      ...atual,
 
-      [id]:
-        (atual[id] || 0) + 1
+  const documento = await getDoc(referencia);
 
-    }));
+
+  if (documento.exists()) {
+
+    await updateDoc(referencia, {
+      curtidas: increment(1)
+    });
+
+
+  } else {
+
+    await setDoc(referencia, {
+      curtidas: 1
+    });
 
   }
+
+
+  localStorage.setItem(
+    `curtiu-${id}`,
+    "true"
+  );
+
+
+  setCurtidas((atual) => ({
+    ...atual,
+    [id]: (atual[id] || 0) + 1
+  }));
+
+}
 
 
 
