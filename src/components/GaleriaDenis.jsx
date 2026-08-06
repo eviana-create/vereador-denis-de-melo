@@ -1,61 +1,41 @@
-import { useEffect, useState } from "react";
-import { db } from "../firebase";
+import { useEffect, useMemo, useState } from "react";
+
 import {
   doc,
   getDoc,
   setDoc,
   updateDoc,
-  increment
+  increment,
 } from "firebase/firestore";
 
+import { db } from "../firebase";
 
-const fotosDenis = [
+import dadosFotos from "./dadosFotos";
 
-  {
-    id: "denis1",
-    imagem: "/imagens/denis/denis1.jpeg",
-    titulo: "Minha trajetória",
-    descricao:
-      "Uma caminhada construída com trabalho, dedicação e proximidade com as pessoas."
-  },
-
-
-  {
-    id: "denis2",
-    imagem: "/imagens/denis/denis2.jpeg",
-    titulo: "Momentos especiais",
-    descricao:
-      "Cada momento representa uma parte da minha história."
-  },
-
-
-  {
-    id: "denis3",
-    imagem: "/imagens/denis/denis3.jpeg",
-    titulo: "Comunidade",
-    descricao:
-      "Estar próximo das pessoas sempre fez parte da minha caminhada."
-  },
-
-
-  {
-    id: "denis4",
-    imagem: "/imagens/denis/denis4.jpeg",
-    titulo: "Nossa história",
-    descricao:
-      "Construindo caminhos junto com a comunidade."
-  }
-
-];
-
-
+import HeroGaleria from "./HeroGaleria";
+import EstatisticasGaleria from "./EstatisticasGaleria";
+import BarraPesquisa from "./BarraPesquisa";
+import Filtros from "./Filtros";
+import CardFoto from "./CardFoto";
+import ModalFoto from "./ModalFoto";
 
 function GaleriaDenis() {
 
-
   const [curtidas, setCurtidas] = useState({});
 
+  const [pesquisa, setPesquisa] = useState("");
 
+  const [categoriaSelecionada, setCategoriaSelecionada] =
+    useState("Todas");
+
+  const [fotoAtual, setFotoAtual] =
+    useState(null);
+
+  /*
+  ===========================
+  Carrega Curtidas
+  ===========================
+  */
 
   useEffect(() => {
 
@@ -63,13 +43,11 @@ function GaleriaDenis() {
 
   }, []);
 
-
-
-  async function carregarCurtidas(){
+  async function carregarCurtidas() {
 
     const resultado = {};
 
-    for(const foto of fotosDenis){
+    for (const foto of dadosFotos) {
 
       const referencia = doc(
         db,
@@ -77,23 +55,19 @@ function GaleriaDenis() {
         foto.id
       );
 
+      const documento =
+        await getDoc(referencia);
 
-      const dados = await getDoc(referencia);
-
-
-      if(dados.exists()){
+      if (documento.exists()) {
 
         resultado[foto.id] =
-          dados.data().curtidas || 0;
+          documento.data().curtidas || 0;
 
       } else {
 
-        await setDoc(
-          referencia,
-          {
-            curtidas: 0
-          }
-        );
+        await setDoc(referencia, {
+          curtidas: 0,
+        });
 
         resultado[foto.id] = 0;
 
@@ -101,30 +75,24 @@ function GaleriaDenis() {
 
     }
 
-
     setCurtidas(resultado);
 
   }
-}
 
+  /*
+  ===========================
+  Curtidas
+  ===========================
+  */
 
-
-  async function curtir(id){
-
+  async function curtir(id) {
 
     const jaCurtiu =
       localStorage.getItem(
         `curtiu-${id}`
       );
 
-
-    if(jaCurtiu){
-
-      return;
-
-    }
-
-
+    if (jaCurtiu) return;
 
     const referencia = doc(
       db,
@@ -132,213 +100,324 @@ function GaleriaDenis() {
       id
     );
 
+    const documento =
+      await getDoc(referencia);
 
-    async function curtir(id) {
+    if (documento.exists()) {
 
-  const jaCurtiu =
-    localStorage.getItem(`curtiu-${id}`);
+      await updateDoc(
+        referencia,
+        {
+          curtidas: increment(1),
+        }
+      );
 
+    } else {
 
-  if (jaCurtiu) {
-    return;
-  }
+      await setDoc(
+        referencia,
+        {
+          curtidas: 1,
+        }
+      );
 
+    }
 
-  const referencia = doc(
-    db,
-    "galeriaDenis",
-    id
-  );
+    localStorage.setItem(
+      `curtiu-${id}`,
+      "true"
+    );
 
-
-  const documento = await getDoc(referencia);
-
-
-  if (documento.exists()) {
-
-    await updateDoc(referencia, {
-      curtidas: increment(1)
-    });
-
-
-  } else {
-
-    await setDoc(referencia, {
-      curtidas: 1
-    });
+    setCurtidas((atual) => ({
+      ...atual,
+      [id]: (atual[id] || 0) + 1,
+    }));
 
   }
 
+  /*
+  ===========================
+  Categorias
+  ===========================
+  */
 
-  localStorage.setItem(
-    `curtiu-${id}`,
-    "true"
-  );
+  const categorias = [
 
+    "Todas",
 
-  setCurtidas((atual) => ({
-    ...atual,
-    [id]: (atual[id] || 0) + 1
-  }));
+    ...new Set(
 
-}
+      dadosFotos.map(
+        (foto) => foto.categoria
+      )
 
+    ),
 
+  ];
 
+  /*
+  ===========================
+  Pesquisa + Filtro
+  ===========================
+  */
+
+  const fotosFiltradas = useMemo(() => {
+
+    return dadosFotos.filter((foto) => {
+
+      const categoriaValida =
+
+        categoriaSelecionada === "Todas"
+
+          ? true
+
+          : foto.categoria ===
+            categoriaSelecionada;
+
+      const pesquisaValida =
+
+        foto.titulo
+          .toLowerCase()
+          .includes(
+            pesquisa.toLowerCase()
+          ) ||
+
+        foto.descricao
+          .toLowerCase()
+          .includes(
+            pesquisa.toLowerCase()
+          );
+
+      return (
+        categoriaValida &&
+        pesquisaValida
+      );
+
+    });
+
+  }, [
+
+    pesquisa,
+
+    categoriaSelecionada
+
+  ]);
+
+  /*
+  ===========================
+  Estatísticas
+  ===========================
+  */
+
+  const totalCurtidas =
+
+    Object.values(curtidas)
+
+      .reduce(
+
+        (total, numero) =>
+          total + numero,
+
+        0
+
+      );
+
+  /*
+  ===========================
+  Modal
+  ===========================
+  */
+
+  function abrirFoto(foto) {
+
+    setFotoAtual(foto);
+
+  }
+
+  function fecharFoto() {
+
+    setFotoAtual(null);
+
+  }
+
+  function proximaFoto() {
+
+    if (!fotoAtual) return;
+
+    const indice =
+
+      fotosFiltradas.findIndex(
+
+        (foto) =>
+          foto.id === fotoAtual.id
+
+      );
+
+    const proximo =
+
+      (indice + 1) %
+
+      fotosFiltradas.length;
+
+    setFotoAtual(
+
+      fotosFiltradas[proximo]
+
+    );
+
+  }
+
+  function fotoAnterior() {
+
+    if (!fotoAtual) return;
+
+    const indice =
+
+      fotosFiltradas.findIndex(
+
+        (foto) =>
+          foto.id === fotoAtual.id
+
+      );
+
+    const anterior =
+
+      indice === 0
+
+        ? fotosFiltradas.length - 1
+
+        : indice - 1;
+
+    setFotoAtual(
+
+      fotosFiltradas[anterior]
+
+    );
+
+  }
+
+  /*
+  ===========================
+  Render
+  ===========================
+  */
 
   return (
 
     <section
       className="
       py-24
-      bg-gray-900
-      text-white
+      bg-slate-100
       "
     >
 
       <div
         className="
-        max-w-6xl
+        max-w-7xl
         mx-auto
         px-6
         "
       >
 
+        <HeroGaleria />
 
-        <div className="text-center mb-14">
+        <EstatisticasGaleria
+          totalFotos={
+            fotosFiltradas.length
+          }
+          totalCurtidas={
+            totalCurtidas
+          }
+        />
 
+        <BarraPesquisa
+          pesquisa={pesquisa}
+          setPesquisa={
+            setPesquisa
+          }
+        />
 
-          <h2
-            className="
-            text-4xl
-            font-black
-            "
-          >
-
-            Conheça minha história
-
-          </h2>
-
-
-          <p
-            className="
-            mt-4
-            text-gray-300
-            "
-          >
-
-            Momentos que fazem parte da minha caminhada.
-
-          </p>
-
-
-        </div>
-
-
+        <Filtros
+          categorias={categorias}
+          categoriaSelecionada={
+            categoriaSelecionada
+          }
+          setCategoriaSelecionada={
+            setCategoriaSelecionada
+          }
+        />
 
         <div
           className="
           grid
-          md:grid-cols-4
+          md:grid-cols-2
+          lg:grid-cols-4
           gap-8
           "
         >
 
+          {
 
-        {fotosDenis.map((foto)=>(
+            fotosFiltradas.map((foto) => (
 
+              <CardFoto
 
-          <div
-            key={foto.id}
-            className="
-            bg-gray-800
-            rounded-3xl
-            overflow-hidden
-            shadow-xl
-            "
-          >
+                key={foto.id}
 
+                foto={foto}
 
-            <img
-              src={foto.imagem}
-              alt={foto.titulo}
-              className="
-              w-full
-              h-64
-              object-cover
-              "
-            />
-
-
-
-            <div className="p-6">
-
-
-              <h3
-                className="
-                text-xl
-                font-bold
-                "
-              >
-                {foto.titulo}
-              </h3>
-
-
-
-              <p
-                className="
-                mt-3
-                text-gray-300
-                "
-              >
-
-                {foto.descricao}
-
-              </p>
-
-
-
-              <button
-                onClick={() =>
-                  curtir(foto.id)
+                curtidas={
+                  curtidas[foto.id]
                 }
-                className="
-                mt-5
-                bg-red-600
-                px-5
-                py-3
-                rounded-xl
-                font-bold
-                hover:bg-red-700
-                transition
-                "
-              >
 
-                ❤️ {curtidas[foto.id] || 0}
+                onCurtir={curtir}
 
-              </button>
+                onAbrir={abrirFoto}
 
+              />
 
-            </div>
+            ))
 
-
-          </div>
-
-
-        ))}
-
+          }
 
         </div>
 
+        <ModalFoto
+
+          aberto={
+            fotoAtual !== null
+          }
+
+          foto={fotoAtual}
+
+          fotos={fotosFiltradas}
+
+          curtidas={
+            fotoAtual
+              ? curtidas[fotoAtual.id]
+              : 0
+          }
+
+          onCurtir={curtir}
+
+          onFechar={fecharFoto}
+
+          onAnterior={
+            fotoAnterior
+          }
+
+          onProxima={
+            proximaFoto
+          }
+
+        />
 
       </div>
-
 
     </section>
 
   );
 
 }
-
 
 export default GaleriaDenis;
