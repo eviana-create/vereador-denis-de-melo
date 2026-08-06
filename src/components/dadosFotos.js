@@ -10,9 +10,9 @@ const categorias = [
 const fotos = Array.from({ length: TOTAL_FOTOS }, (_, index) => ({
   id: `denis${index + 1}`,
   imagem: `/imagens/galeriadenis/denis${index + 1}.jpeg`,
-  titulo: `Momento ${index + 1}`,
-  descricao: "Registro da caminhada ao lado da comunidade.",
-  categoria: categorias[index % categorias.length]
+  titulo: ``,
+  descricao: "",
+  
 }));
 
 export default fotos;

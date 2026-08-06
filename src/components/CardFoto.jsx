@@ -24,7 +24,6 @@ function CardFoto({
         onClick={() => onAbrir(foto)}
         className="block w-full overflow-hidden"
       >
-        <p>{foto.imagem}</p>
         <img
           src={foto.imagem}
           alt={foto.titulo}
