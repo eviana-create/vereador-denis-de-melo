@@ -86,6 +86,7 @@ function GaleriaDenis() {
   */
 
   async function curtir(id) {
+    console.log("clicou na foto:", id);
 
     const jaCurtiu =
       localStorage.getItem(

@@ -4,7 +4,7 @@ function CardFoto({
   foto,
   curtidas,
   onCurtir,
-  onAbrir
+  onAbrir,
 }) {
   return (
     <article
@@ -22,7 +22,7 @@ function CardFoto({
     >
       <button
         onClick={() => onAbrir(foto)}
-        className="block w-full overflow-hidden"
+        className="block w-full"
       >
         <img
           src={foto.imagem}
@@ -40,7 +40,6 @@ function CardFoto({
       </button>
 
       <div className="p-6">
-
         <span
           className="
             inline-block
@@ -72,7 +71,6 @@ function CardFoto({
             onCurtir={onCurtir}
           />
         </div>
-
       </div>
     </article>
   );
